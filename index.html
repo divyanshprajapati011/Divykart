@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DivyKart Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#2563EB;--p-light:#EFF6FF;--bg:#F6F8FC;--surface:#fff;--text:#0F172A;--muted:#64748B;--border:#E2E8F0;--danger:#DC2626;--success:#16A34A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif}
+.wrap{max-width:1250px;margin:auto;padding:0 24px}
+.top{background:var(--surface);border-bottom:1px solid var(--border)}
+.topin{height:70px;display:flex;align-items:center;justify-content:space-between}
+.brand{font:800 20px Sora}
+.brand span{color:#F97316}
+.btn{border:0;border-radius:9px;padding:10px 16px;background:var(--p);color:#fff;font-weight:700;cursor:pointer;font-size:13px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.danger{background:var(--danger)}
+.btn.ghost{background:#fff;color:var(--text);border:1px solid var(--border)}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:7px}
+.login{max-width:420px;margin:80px auto;background:#fff;padding:30px;border-radius:18px;box-shadow:0 15px 45px rgba(15,23,42,.08)}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;outline:0;font:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--p)}
+label{display:block;font-size:12px;font-weight:700;margin:12px 0 6px}
+.error{color:var(--danger);font-size:13px;margin-top:10px}
+.dashboard{padding:30px 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:20px 0}
+.stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px}
+.stat b{font:800 28px Sora}
+.panel{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:20px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.table-wrap{overflow:auto}
+.table{width:100%;border-collapse:collapse;min-width:850px}
+.table th,.table td{padding:12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
+.table img{width:48px;height:48px;object-fit:cover;border-radius:8px;background:#F1F5F9}
+.actions{display:flex;gap:7px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;background:#F8FAFC;padding:18px;border-radius:12px;margin-bottom:20px}
+.full{grid-column:1/-1}
+.message{padding:10px;border-radius:8px;margin-bottom:12px;background:#ECFDF5;color:#166534}
+.hidden{display:none}
+
+/* ---------------- Image upload UI ---------------- */
+.upload-header{display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px}
+.upload-counter{font-size:12px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:20px;padding:4px 10px}
+.upload-counter.full{color:var(--danger);border-color:var(--danger)}
+.dropzone{border:2px dashed var(--border);border-radius:14px;padding:26px 16px;text-align:center;cursor:pointer;background:#fff;transition:border-color .15s ease,background .15s ease,transform .1s ease}
+.dropzone:hover{border-color:var(--p);background:var(--p-light)}
+.dropzone.dragover{border-color:var(--p);background:var(--p-light);transform:scale(1.01)}
+.dropzone.disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
+.dropzone svg{width:34px;height:34px;color:var(--p);margin-bottom:6px}
+.dropzone .dz-title{font-weight:700;font-size:14px}
+.dropzone .dz-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.progress-wrap{margin-top:10px}
+.progress-bar{height:8px;border-radius:6px;background:#E2E8F0;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:var(--p);transition:width .15s ease}
+.progress-label{font-size:11px;color:var(--muted);margin-top:4px}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px;margin-top:14px}
+.preview-card{position:relative;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;aspect-ratio:1/1;cursor:grab;transition:transform .12s ease,box-shadow .12s ease}
+.preview-card:active{cursor:grabbing}
+.preview-card.dragging{opacity:.4}
+.preview-card.drag-over{box-shadow:0 0 0 2px var(--p) inset}
+.preview-card img{width:100%;height:100%;object-fit:cover;display:block}
+.preview-card .remove-btn{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(15,23,42,.75);color:#fff;border:0;cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center}
+.preview-card .remove-btn:hover{background:var(--danger)}
+.preview-card .thumb-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(37,99,235,.9);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:2px 0}
+.upload-error{color:var(--danger);font-size:12px;margin-top:8px}
+
+.tabs{display:flex;gap:8px;margin:22px 0 6px;border-bottom:1px solid var(--border)}
+.tab-btn{border:0;background:transparent;padding:11px 16px;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab-btn.active{color:var(--p);border-bottom-color:var(--p)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.color-row{display:flex;align-items:center;gap:8px}.color-row input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--border);border-radius:8px;cursor:pointer}.color-row input[type=text]{flex:1}
+.swatch-preview{height:64px;border-radius:10px;margin-top:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px}
+.banner-card{display:flex;gap:14px;align-items:center;padding:14px;border:1px solid var(--border);border-radius:12px;margin-bottom:10px}
+.banner-card .swatch{width:64px;height:44px;border-radius:8px;flex-shrink:0}
+.banner-card .meta{flex:1;min-width:0}.banner-card .meta b{display:block;font-size:13px}.banner-card .meta span{font-size:11px;color:var(--muted)}
+.review-row .cmt{max-width:320px;font-size:12px;color:var(--muted);white-space:normal}
+@media(max-width:700px){
+  .stats{grid-template-columns:1fr 1fr}
+  .form{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .wrap{padding:0 14px}
+  .preview-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin wrap"><div class="brand">DivyKart<span> Admin</span></div><div><button class="btn ghost" onclick="location.href='/'">View Store</button> <button id="logout" class="btn danger hidden" onclick="logout()">Logout</button></div></div></header>
+<main class="wrap">
+
+<section id="loginBox" class="login">
+  <h2>Admin Login</h2>
+  <p>Manage products stored permanently in <b>data/products.json</b>.</p>
+  <label>Username</label><input id="user" value="admin">
+  <label>Password</label><input id="pass" type="password">
+  <button class="btn" style="width:100%;margin-top:15px" onclick="login()">Login</button>
+  <div id="loginError" class="error"></div>
+</section>
+
+<section id="dashboard" class="dashboard hidden">
+  <h1>Product Dashboard</h1>
+  <p style="color:var(--muted)">Changes made here are written to the local filesystem and survive browser refreshes and server restarts.</p>
+  <div class="stats">
+    <div class="stat"><b id="total">0</b><div>Total Products</div></div>
+    <div class="stat"><b id="cats">0</b><div>Categories</div></div>
+    <div class="stat"><b id="platforms">0</b><div>Platforms</div></div>
+    <div class="stat"><b id="clicks">0</b><div>Review Count</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tabBtnProducts" onclick="switchTab('products')">Products</button>
+    <button class="tab-btn" id="tabBtnBanners" onclick="switchTab('banners')">Homepage Banners</button>
+    <button class="tab-btn" id="tabBtnReviews" onclick="switchTab('reviews')">Reviews</button>
+  </div>
+
+  <div id="tabPanelProducts" class="tab-panel active">
+    <div class="panel">
+      <div class="toolbar"><h3>Product Catalog</h3><button class="btn" onclick="openForm()">+ Add Product</button></div>
+      <div id="formBox" class="hidden"></div>
+      <div id="message"></div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Platform</th><th>Price</th><th>Price Updated</th><th>Rating</th><th>Stock</th><th>Actions</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tabPanelBanners" class="tab-panel">
+    <div class="panel">
+      <div class="toolbar"><h3>Homepage Hero Banners</h3><button class="btn" onclick="openBannerForm()">+ Add Banner</button></div>
+      <p style="color:var(--muted);font-size:12.5px;margin-top:-8px">Edit the sliding banners shown at the top of the homepage — no code changes needed.</p>
+      <div id="bannerFormBox" class="hidden"></div>
+      <div id="bannerMessage"></div>
+      <div id="bannerList"></div>
+    </div>
+  </div>
+
+  <div id="tabPanelReviews" class="tab-panel">
+    <div class="panel">
+      <div class="toolbar"><h3>Shopper Reviews</h3><span style="color:var(--muted);font-size:12px">Remove spam or inappropriate reviews — ratings recalculate automatically.</span></div>
+      <div id="reviewsMessage"></div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Product</th><th>Name</th><th>Rating</th><th>Comment</th><th>Posted</th><th>Actions</th></tr></thead>
+          <tbody id="reviewRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+/* ============================================================
+   State
+   ============================================================ */
+let token = sessionStorage.getItem("divykart_admin_token") || "";
+let products = [];
+let editingId = null;
+
+// Ordered array of image paths (strings, e.g. "/uploads/xxx/yyy.webp")
+// for the product currently being created/edited. First entry = thumbnail.
+let formImages = [];
+let dragImgIndex = null; // index currently being dragged during reorder
+
+const MAX_IMAGES = 10;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const categories = ["Electronics","Mobiles","Fashion","Beauty","Grocery","Kitchen","Home Decor","Furniture","Appliances","Books","Sports","Toys","Automotive"];
+const platforms = ["Flipkart","Meesho","Amazon","Myntra","Ajio","Nykaa","Tata CliQ"];
+const fashionSubCategories = ["Men","Women","Kids"];
+let banners = [];
+let editingBannerId = null;
+let reviews = [];
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
+}
+
+// Renders a small "N days ago" label for a product's price timestamp,
+// turned red once it's stale, so admins know which prices to re-check.
+function priceUpdatedCell(ts) {
+  if (!ts) return `<span style="color:#dc2626;font-size:11px;font-weight:700">Never set</span>`;
+  const days = Math.floor((Date.now() - ts) / 86400000);
+  const label = days <= 0 ? "Today" : days === 1 ? "1 day ago" : days < 30 ? `${days} days ago` : `${Math.floor(days / 30)} mo ago`;
+  const stale = days >= 7;
+  return `<span style="font-size:11px;font-weight:700;${stale ? "color:#dc2626" : "color:#16a34a"}">${label}</span>`;
+}
+
+async function api(url, opt = {}) {
+  opt.headers = { ...(opt.headers || {}), ...(token ? { Authorization: "Bearer " + token } : {}) };
+  if (opt.body && !(opt.body instanceof FormData)) {
+    opt.headers["Content-Type"] = "application/json";
+  }
+  let r = await fetch(url, opt);
+  let d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || "Request failed");
+  return d;
+}
+
+/* ============================================================
+   Auth
+   ============================================================ */
+async function login() {
+  try {
+    let d = await api("/api/admin/login", { method: "POST", body: JSON.stringify({ username: document.getElementById("user").value, password: document.getElementById("pass").value }) });
+    token = d.token;
+    sessionStorage.setItem("divykart_admin_token", token);
+    showDashboard();
+  } catch (e) {
+    document.getElementById("loginError").textContent = e.message;
+  }
+}
+
+async function logout() {
+  if (token) await api("/api/admin/logout", { method: "POST" }).catch(() => {});
+  token = "";
+  sessionStorage.removeItem("divykart_admin_token");
+  location.reload();
+}
+
+async function load() {
+  products = await api("/api/products");
+  render();
+}
+
+function showDashboard() {
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("logout").classList.remove("hidden");
+  load().catch(e => { if (e.message === "Unauthorized") logout(); });
+}
+
+/* ============================================================
+   Dashboard + table rendering
+   ============================================================ */
+function render() {
+  document.getElementById("total").textContent = products.length;
+  document.getElementById("cats").textContent = new Set(products.map(p => p.category)).size;
+  document.getElementById("platforms").textContent = new Set(products.map(p => p.platform)).size;
+  document.getElementById("clicks").textContent = products.reduce((a, p) => a + (Number(p.reviewCount) || 0), 0).toLocaleString("en-IN");
+  document.getElementById("rows").innerHTML = products.map(p => `
+    <tr>
+      <td><img src="${esc(p.images?.[0] || "")}" onerror="this.style.visibility='hidden'"></td>
+      <td><b>${esc(p.name)}</b><br><small>${esc(p.brand)}</small></td>
+      <td>${esc(p.category)}${p.subCategory ? ` <span style="color:var(--muted);font-weight:600">(${esc(p.subCategory)})</span>` : ""}</td>
+      <td>${esc(p.platform)}</td>
+      <td>₹${Number(p.discountPrice || 0).toLocaleString("en-IN")}</td>
+      <td>${priceUpdatedCell(p.priceUpdatedAt)}</td>
+      <td>★ ${p.rating}</td>
+      <td>${esc(p.stockStatus)}</td>
+      <td><div class="actions">
+        <button class="btn ghost sm" onclick="openForm('${esc(p.id)}')">Edit</button>
+        <button class="btn danger sm" onclick="removeProduct('${esc(p.id)}')">Delete</button>
+      </div></td>
+    </tr>`).join("");
+}
+
+/* ============================================================
+   Product form (create / edit)
+   ============================================================ */
+function openForm(id = null) {
+  editingId = id;
+  const p = id ? products.find(x => x.id === id) : {};
+  formImages = Array.isArray(p.images) ? [...p.images] : [];
+
+  document.getElementById("formBox").classList.remove("hidden");
+  document.getElementById("formBox").innerHTML = `
+    <div class="form">
+      <h3 class="full">${id ? "Edit Product" : "Add New Product"}</h3>
+
+      <div><label>Product Name</label><input id="f_name" value="${esc(p.name)}"></div>
+      <div><label>Brand</label><input id="f_brand" value="${esc(p.brand)}"></div>
+
+      <div><label>Category</label><select id="f_category" onchange="onCategoryChange()">${categories.map(x => `<option ${p.category === x ? "selected" : ""}>${x}</option>`).join("")}</select></div>
+      <div><label>Platform</label><select id="f_platform">${platforms.map(x => `<option ${p.platform === x ? "selected" : ""}>${x}</option>`).join("")}</select></div>
+
+      <div id="subCategoryWrap" class="${p.category === "Fashion" ? "" : "hidden"}">
+        <label>Fashion Sub-Category</label>
+        <select id="f_subcategory">
+          <option value="">— Select —</option>
+          ${fashionSubCategories.map(x => `<option value="${x}" ${p.subCategory === x ? "selected" : ""}>${x}</option>`).join("")}
+        </select>
+      </div>
+      <div></div>
+
+      <div><label>Original Price ₹</label><input id="f_price" type="number" min="0" value="${p.price ?? ""}"></div>
+      <div><label>Discount Price ₹</label><input id="f_dprice" type="number" min="0" value="${p.discountPrice ?? ""}"></div>
+
+      <div><label>Rating 0-5</label><input id="f_rating" type="number" min="0" max="5" step=".1" value="${p.rating ?? 4}"></div>
+      <div><label>Review Count</label><input id="f_reviews" type="number" min="0" value="${p.reviewCount ?? 0}"></div>
+
+      <div class="full"><label>Affiliate URL</label><input id="f_url" value="${esc(p.affiliateUrl || "")}"></div>
+
+      <div class="full">
+        <div class="upload-header">
+          <label style="margin:0">Product Images</label>
+          <span id="uploadCounter" class="upload-counter">0/${MAX_IMAGES}</span>
+        </div>
+        <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <div class="dz-title">Drag &amp; drop images here, or click to browse</div>
+          <div class="dz-sub">JPG, JPEG, PNG or WEBP · up to 5MB each · max ${MAX_IMAGES} images</div>
+          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" multiple class="hidden" onchange="handleFiles(this.files); this.value='';">
+        </div>
+        <div id="uploadProgress" class="progress-wrap hidden">
+          <div class="progress-bar"><div id="progressFill" class="progress-bar-fill"></div></div>
+          <div id="progressLabel" class="progress-label">Uploading…</div>
+        </div>
+        <div id="uploadError" class="upload-error"></div>
+        <div id="previewGrid" class="preview-grid"></div>
+      </div>
+
+      <div><label>Delivery Badge</label><input id="f_delivery" value="${esc(p.deliveryBadge || "Free Delivery in 3 Days")}"></div>
+      <div><label>Stock Status</label><select id="f_stock">
+        <option ${p.stockStatus === "In Stock" ? "selected" : ""}>In Stock</option>
+        <option ${p.stockStatus === "Out of Stock" ? "selected" : ""}>Out of Stock</option>
+        <option ${p.stockStatus === "Limited Stock" ? "selected" : ""}>Limited Stock</option>
+      </select></div>
+
+      <div class="full"><label>Offer Tag</label><input id="f_tag" value="${esc(p.offerTag || "")}"></div>
+      <div class="full"><label>Description</label><textarea id="f_desc" rows="4">${esc(p.description || "")}</textarea></div>
+
+      <div class="full">
+        <button class="btn" onclick="saveProduct()">Save Product</button>
+        <button class="btn ghost" onclick="closeForm()">Cancel</button>
+      </div>
+    </div>`;
+
+  setupDropzone();
+  renderPreviewGrid();
+}
+
+function closeForm() {
+  document.getElementById("formBox").classList.add("hidden");
+  editingId = null;
+  formImages = [];
+}
+
+function onCategoryChange() {
+  const wrap = document.getElementById("subCategoryWrap");
+  const isFashion = document.getElementById("f_category").value === "Fashion";
+  wrap.classList.toggle("hidden", !isFashion);
+  if (!isFashion) document.getElementById("f_subcategory").value = "";
+}
+
+/* ============================================================
+   Drag & drop / click-to-browse upload
+   ============================================================ */
+function setupDropzone() {
+  const zone = document.getElementById("dropzone");
+  ["dragenter", "dragover"].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault();
+    zone.classList.add("dragover");
+  }));
+  ["dragleave", "drop"].forEach(evt => zone.addEventListener(evt, e => {
+    e.preventDefault();
+    zone.classList.remove("dragover");
+  }));
+  zone.addEventListener("drop", e => {
+    if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
+  });
+}
+
+function setUploadError(msg) {
+  document.getElementById("uploadError").textContent = msg || "";
+}
+
+async function handleFiles(fileList) {
+  setUploadError("");
+  const incoming = Array.from(fileList || []);
+  if (!incoming.length) return;
+
+  const remainingSlots = MAX_IMAGES - formImages.length;
+  if (remainingSlots <= 0) {
+    setUploadError(`You can upload a maximum of ${MAX_IMAGES} images per product.`);
+    return;
+  }
+
+  // Client-side validation before we ever hit the network.
+  const valid = [];
+  const rejected = [];
+  for (const file of incoming) {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      rejected.push(`${file.name}: unsupported format`);
+      continue;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      rejected.push(`${file.name}: larger than 5MB`);
+      continue;
+    }
+    valid.push(file);
+  }
+
+  const accepted = valid.slice(0, remainingSlots);
+  if (valid.length > remainingSlots) {
+    rejected.push(`Only ${remainingSlots} more image(s) can be added (max ${MAX_IMAGES}).`);
+  }
+  if (rejected.length) setUploadError(rejected.join(" · "));
+  if (!accepted.length) return;
+
+  await uploadFiles(accepted);
+}
+
+function uploadFiles(files) {
+  return new Promise((resolve) => {
+    const zone = document.getElementById("dropzone");
+    const progressWrap = document.getElementById("uploadProgress");
+    const progressFill = document.getElementById("progressFill");
+    const progressLabel = document.getElementById("progressLabel");
+
+    const formData = new FormData();
+    files.forEach(f => formData.append("images", f));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload-images");
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
+
+    zone.classList.add("disabled");
+    progressWrap.classList.remove("hidden");
+    progressFill.style.width = "0%";
+    progressLabel.textContent = "Uploading…";
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        progressFill.style.width = pct + "%";
+        progressLabel.textContent = `Uploading… ${pct}%`;
+      }
+    };
+
+    xhr.onload = () => {
+      zone.classList.remove("disabled");
+      progressWrap.classList.add("hidden");
+      try {
+        const data = JSON.parse(xhr.responseText || "{}");
+        if (xhr.status >= 200 && xhr.status < 300 && Array.isArray(data.images)) {
+          formImages.push(...data.images);
+          renderPreviewGrid();
+        } else {
+          setUploadError(data.error || "Upload failed");
+        }
+      } catch {
+        setUploadError("Upload failed");
+      }
+      resolve();
+    };
+
+    xhr.onerror = () => {
+      zone.classList.remove("disabled");
+      progressWrap.classList.add("hidden");
+      setUploadError("Upload failed — check your connection");
+      resolve();
+    };
+
+    xhr.send(formData);
+  });
+}
+
+/* ============================================================
+   Preview grid: remove + drag-to-reorder
+   ============================================================ */
+function renderPreviewGrid() {
+  const grid = document.getElementById("previewGrid");
+  const counter = document.getElementById("uploadCounter");
+  const zone = document.getElementById("dropzone");
+
+  counter.textContent = `${formImages.length}/${MAX_IMAGES}`;
+  counter.classList.toggle("full", formImages.length >= MAX_IMAGES);
+  zone.classList.toggle("disabled", formImages.length >= MAX_IMAGES);
+
+  grid.innerHTML = formImages.map((src, i) => `
+    <div class="preview-card" draggable="true" data-index="${i}">
+      <img src="${esc(src)}" alt="Product image ${i + 1}">
+      <button type="button" class="remove-btn" onclick="removeImage(${i})" title="Remove image">✕</button>
+      ${i === 0 ? '<div class="thumb-badge">Thumbnail</div>' : ""}
+    </div>`).join("");
+
+  grid.querySelectorAll(".preview-card").forEach(card => {
+    card.addEventListener("dragstart", () => {
+      dragImgIndex = Number(card.dataset.index);
+      card.classList.add("dragging");
+    });
+    card.addEventListener("dragend", () => card.classList.remove("dragging"));
+    card.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      card.classList.add("drag-over");
+    });
+    card.addEventListener("dragleave", () => card.classList.remove("drag-over"));
+    card.addEventListener("drop", (e) => {
+      e.preventDefault();
+      card.classList.remove("drag-over");
+      const targetIndex = Number(card.dataset.index);
+      if (dragImgIndex === null || dragImgIndex === targetIndex) return;
+      const [moved] = formImages.splice(dragImgIndex, 1);
+      formImages.splice(targetIndex, 0, moved);
+      dragImgIndex = null;
+      renderPreviewGrid();
+    });
+  });
+}
+
+async function removeImage(index) {
+  const [removed] = formImages.splice(index, 1);
+  renderPreviewGrid();
+  // Best-effort immediate cleanup on the server; if the admin cancels the
+  // form afterwards the file is already gone rather than left orphaned.
+  if (removed) {
+    api("/api/upload-images", { method: "DELETE", body: JSON.stringify({ path: removed }) }).catch(() => {});
+  }
+}
+
+/* ============================================================
+   Save / delete product
+   ============================================================ */
+async function saveProduct() {
+  const price = Number(document.getElementById("f_price").value || 0);
+  const dprice = Number(document.getElementById("f_dprice").value || 0);
+
+  const data = {
+    name: document.getElementById("f_name").value.trim(),
+    brand: document.getElementById("f_brand").value.trim() || "Generic",
+    category: document.getElementById("f_category").value,
+    subCategory: document.getElementById("f_category").value === "Fashion"
+      ? (document.getElementById("f_subcategory").value || null)
+      : null,
+    platform: document.getElementById("f_platform").value,
+    price, discountPrice: dprice,
+    rating: Number(document.getElementById("f_rating").value || 4),
+    reviewCount: Number(document.getElementById("f_reviews").value || 0),
+    affiliateUrl: document.getElementById("f_url").value.trim(),
+    images: [...formImages],
+    deliveryBadge: document.getElementById("f_delivery").value.trim(),
+    stockStatus: document.getElementById("f_stock").value,
+    offerTag: document.getElementById("f_tag").value.trim() || null,
+    description: document.getElementById("f_desc").value.trim()
+  };
+
+  try {
+    if (editingId) await api("/api/products/" + encodeURIComponent(editingId), { method: "PUT", body: JSON.stringify(data) });
+    else await api("/api/products", { method: "POST", body: JSON.stringify(data) });
+    closeForm();
+    await load();
+    showMessage(editingId ? "Product updated" : "Product added");
+  } catch (e) {
+    showMessage(e.message, true);
+  }
+}
+
+async function removeProduct(id) {
+  if (!confirm("Delete this product and its uploaded images permanently?")) return;
+  try {
+    await api("/api/products/" + encodeURIComponent(id), { method: "DELETE" });
+    await load();
+    showMessage("Product deleted");
+  } catch (e) {
+    showMessage(e.message, true);
+  }
+}
+
+function showMessage(msg, error = false) {
+  const el = document.getElementById("message");
+  el.className = error ? "error" : "message";
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ""; }, 2500);
+}
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+function switchTab(name) {
+  ["products", "banners", "reviews"].forEach((t) => {
+    document.getElementById(`tabPanel${cap(t)}`).classList.toggle("active", t === name);
+    document.getElementById(`tabBtn${cap(t)}`).classList.toggle("active", t === name);
+  });
+  if (name === "banners") loadBanners();
+  if (name === "reviews") loadReviews();
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ============================================================
+   Homepage Banners ("canvas") management
+   ============================================================ */
+async function loadBanners() {
+  try {
+    banners = await api("/api/banners");
+    renderBannerList();
+  } catch (e) {
+    showBannerMessage(e.message, true);
+  }
+}
+
+function renderBannerList() {
+  const wrap = document.getElementById("bannerList");
+  if (!banners.length) {
+    wrap.innerHTML = `<p style="color:var(--muted)">No banners yet — add one to populate the homepage hero.</p>`;
+    return;
+  }
+  wrap.innerHTML = banners.map((b) => `
+    <div class="banner-card">
+      <div class="swatch" style="background:linear-gradient(115deg,${esc(b.gradientFrom)},${esc(b.gradientTo)})"></div>
+      <div class="meta">
+        <b>${esc(b.title)}</b>
+        <span>${esc(b.tag || "")} · order ${b.order ?? "—"} · CTA: "${esc(b.buttonText || "")}" → ${esc(b.buttonAction || "")}</span>
+      </div>
+      <div class="actions">
+        <button class="btn ghost sm" onclick="openBannerForm('${esc(b.id)}')">Edit</button>
+        <button class="btn danger sm" onclick="removeBanner('${esc(b.id)}')">Delete</button>
+      </div>
+    </div>`).join("");
+}
+
+function openBannerForm(id = null) {
+  editingBannerId = id;
+  const b = id ? banners.find((x) => x.id === id) : {};
+  const box = document.getElementById("bannerFormBox");
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <div class="form">
+      <h3 class="full">${id ? "Edit Banner" : "Add New Banner"}</h3>
+
+      <div class="full"><label>Eyebrow Tag</label><input id="bf_tag" value="${esc(b.tag || "")}" placeholder="DIVYKART • FLASH SALE"></div>
+      <div class="full"><label>Title</label><input id="bf_title" value="${esc(b.title || "")}" placeholder="Smart deals. Better prices."></div>
+      <div class="full"><label>Subtitle</label><textarea id="bf_subtitle" rows="2">${esc(b.subtitle || "")}</textarea></div>
+
+      <div>
+        <label>Gradient Start</label>
+        <div class="color-row">
+          <input type="color" id="bf_gradFrom" value="${b.gradientFrom || "#2563eb"}" oninput="updateSwatchPreview()">
+          <input type="text" id="bf_gradFromText" value="${b.gradientFrom || "#2563eb"}" oninput="syncColorInput('bf_gradFrom',this.value)">
+        </div>
+      </div>
+      <div>
+        <label>Gradient End</label>
+        <div class="color-row">
+          <input type="color" id="bf_gradTo" value="${b.gradientTo || "#4f8dfb"}" oninput="updateSwatchPreview()">
+          <input type="text" id="bf_gradToText" value="${b.gradientTo || "#4f8dfb"}" oninput="syncColorInput('bf_gradTo',this.value)">
+        </div>
+      </div>
+      <div class="full"><div id="swatchPreview" class="swatch-preview">Live Preview</div></div>
+
+      <div><label>Button Text</label><input id="bf_btnText" value="${esc(b.buttonText || "Explore Deals")}"></div>
+      <div>
+        <label>Button Action</label>
+        <select id="bf_btnAction">
+          <option value="scroll" ${b.buttonAction === "scroll" ? "selected" : ""}>Scroll to Products</option>
+          <option value="deals" ${b.buttonAction === "deals" ? "selected" : ""}>Show Biggest Discounts</option>
+          ${categories.map(c => `<option value="category:${c}" ${b.buttonAction === `category:${c}` ? "selected" : ""}>Open Category: ${c}</option>`).join("")}
+          <option value="custom" ${b.buttonAction && /^https?:\/\//i.test(b.buttonAction) ? "selected" : ""}>Custom URL…</option>
+        </select>
+        <input id="bf_btnActionCustom" placeholder="https://…" style="margin-top:8px" value="${b.buttonAction && /^https?:\/\//i.test(b.buttonAction) ? esc(b.buttonAction) : ""}" class="${b.buttonAction && /^https?:\/\//i.test(b.buttonAction) ? "" : "hidden"}">
+      </div>
+
+      <div><label>Secondary Button Text (optional)</label><input id="bf_secText" value="${esc(b.secondaryText || "")}"></div>
+      <div><label>Secondary Action</label><input id="bf_secAction" value="${esc(b.secondaryAction || "")}" placeholder="deals / category:Fashion / URL"></div>
+
+      <div><label>Order</label><input id="bf_order" type="number" min="1" value="${b.order ?? banners.length + 1}"></div>
+
+      <div class="full">
+        <button class="btn" onclick="saveBanner()">Save Banner</button>
+        <button class="btn ghost" onclick="closeBannerForm()">Cancel</button>
+      </div>
+    </div>`;
+
+  document.getElementById("bf_btnAction").addEventListener("change", (e) => {
+    document.getElementById("bf_btnActionCustom").classList.toggle("hidden", e.target.value !== "custom");
+  });
+  updateSwatchPreview();
+}
+
+function syncColorInput(colorId, value) {
+  if (/^#[0-9a-f]{6}$/i.test(value)) document.getElementById(colorId).value = value;
+  updateSwatchPreview();
+}
+
+function updateSwatchPreview() {
+  const from = document.getElementById("bf_gradFrom").value;
+  const to = document.getElementById("bf_gradTo").value;
+  document.getElementById("bf_gradFromText").value = from;
+  document.getElementById("bf_gradToText").value = to;
+  document.getElementById("swatchPreview").style.background = `linear-gradient(115deg,${from},${to})`;
+}
+
+function closeBannerForm() {
+  document.getElementById("bannerFormBox").classList.add("hidden");
+  editingBannerId = null;
+}
+
+async function saveBanner() {
+  const actionSelect = document.getElementById("bf_btnAction").value;
+  const buttonAction = actionSelect === "custom"
+    ? document.getElementById("bf_btnActionCustom").value.trim()
+    : actionSelect;
+
+  const data = {
+    tag: document.getElementById("bf_tag").value.trim(),
+    title: document.getElementById("bf_title").value.trim(),
+    subtitle: document.getElementById("bf_subtitle").value.trim(),
+    gradientFrom: document.getElementById("bf_gradFrom").value,
+    gradientTo: document.getElementById("bf_gradTo").value,
+    buttonText: document.getElementById("bf_btnText").value.trim(),
+    buttonAction,
+    secondaryText: document.getElementById("bf_secText").value.trim(),
+    secondaryAction: document.getElementById("bf_secAction").value.trim(),
+    order: Number(document.getElementById("bf_order").value || 1)
+  };
+
+  try {
+    if (editingBannerId) await api("/api/banners/" + encodeURIComponent(editingBannerId), { method: "PUT", body: JSON.stringify(data) });
+    else await api("/api/banners", { method: "POST", body: JSON.stringify(data) });
+    closeBannerForm();
+    await loadBanners();
+    showBannerMessage(editingBannerId ? "Banner updated" : "Banner added");
+  } catch (e) {
+    showBannerMessage(e.message, true);
+  }
+}
+
+async function removeBanner(id) {
+  if (!confirm("Delete this banner?")) return;
+  try {
+    await api("/api/banners/" + encodeURIComponent(id), { method: "DELETE" });
+    await loadBanners();
+    showBannerMessage("Banner deleted");
+  } catch (e) {
+    showBannerMessage(e.message, true);
+  }
+}
+
+function showBannerMessage(msg, error = false) {
+  const el = document.getElementById("bannerMessage");
+  el.className = error ? "error" : "message";
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ""; }, 2500);
+}
+
+/* ============================================================
+   Reviews moderation
+   ============================================================ */
+async function loadReviews() {
+  try {
+    reviews = await api("/api/reviews");
+    renderReviewRows();
+  } catch (e) {
+    showReviewMessage(e.message, true);
+  }
+}
+
+function renderReviewRows() {
+  const rows = document.getElementById("reviewRows");
+  if (!reviews.length) {
+    rows.innerHTML = `<tr><td colspan="6" style="color:var(--muted)">No reviews submitted yet.</td></tr>`;
+    return;
+  }
+  rows.innerHTML = reviews.map((r) => {
+    const product = products.find((p) => p.id === r.productId);
+    const days = Math.floor((Date.now() - r.createdAt) / 86400000);
+    const posted = days <= 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
+    return `<tr class="review-row">
+      <td>${esc(product ? product.name : r.productId)}</td>
+      <td>${esc(r.name)}</td>
+      <td>★ ${r.rating}</td>
+      <td class="cmt">${esc(r.comment)}</td>
+      <td>${posted}</td>
+      <td><button class="btn danger sm" onclick="removeReview('${esc(r.id)}')">Delete</button></td>
+    </tr>`;
+  }).join("");
+}
+
+async function removeReview(id) {
+  if (!confirm("Delete this review? The product's rating will be recalculated.")) return;
+  try {
+    await api("/api/reviews/" + encodeURIComponent(id), { method: "DELETE" });
+    await loadReviews();
+    await load(); // refresh product ratings in the Products tab too
+    showReviewMessage("Review deleted");
+  } catch (e) {
+    showReviewMessage(e.message, true);
+  }
+}
+
+function showReviewMessage(msg, error = false) {
+  const el = document.getElementById("reviewsMessage");
+  el.className = error ? "error" : "message";
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ""; }, 2500);
+}
+
+if (token) showDashboard();
+</script>
+</body>
+</html>
