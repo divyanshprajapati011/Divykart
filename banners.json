@@ -1,0 +1,41 @@
+[
+  {
+    "id": "b1",
+    "tag": "DIVYKART • FLASH SALE",
+    "title": "Smart deals. Better prices. One place.",
+    "subtitle": "Discover handpicked products and compare the best offers from India's favourite shopping platforms.",
+    "gradientFrom": "#102b91",
+    "gradientTo": "#4f8dfb",
+    "buttonText": "Explore Deals",
+    "buttonAction": "scroll",
+    "secondaryText": "View Biggest Discounts",
+    "secondaryAction": "deals",
+    "order": 1
+  },
+  {
+    "id": "b2",
+    "tag": "FASHION EDIT • UP TO 70% OFF",
+    "title": "Upgrade your style without overspending.",
+    "subtitle": "Trending fashion, beauty and everyday essentials — curated for smarter shopping.",
+    "gradientFrom": "#64145f",
+    "gradientTo": "#d946ef",
+    "buttonText": "Shop Fashion",
+    "buttonAction": "category:Fashion",
+    "secondaryText": "",
+    "secondaryAction": "",
+    "order": 2
+  },
+  {
+    "id": "b3",
+    "tag": "HOME & KITCHEN • SMART SHOPPING",
+    "title": "Make every corner of your home better.",
+    "subtitle": "Explore useful kitchen, appliance and home products at prices worth checking.",
+    "gradientFrom": "#a83b0b",
+    "gradientTo": "#fb923c",
+    "buttonText": "Explore Kitchen",
+    "buttonAction": "category:Kitchen",
+    "secondaryText": "",
+    "secondaryAction": "",
+    "order": 3
+  }
+]

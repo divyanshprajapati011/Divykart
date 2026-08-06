@@ -1,0 +1,15 @@
+{
+  "name": "divykart-localhost",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DivyKart localhost store with Express API and persistent products.json storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^2.2.0"
+  }
+}
